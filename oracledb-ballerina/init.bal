@@ -14,15 +14,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/io;
-import ballerina/test;
+import ballerina/jballerina.java;
 
-@test:BeforeSuite
-isolated function beforeSuite() {
-    io:println("Test suite initiated");
+isolated function init() {
+    setModule();
 }
 
-@test:AfterSuite {}
-isolated function afterSuite() {
-    io:println("Test suite finished");
-}
+isolated function setModule() = @java:Method {
+    'class: "org.ballerinalang.oracledb.utils.ModuleUtils"
+} external;
+

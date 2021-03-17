@@ -1,4 +1,4 @@
-// Copyright (c) 2020 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 //
 // WSO2 Inc. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -22,8 +22,8 @@ import ballerina/sql;
 # + year - Number of years
 # + month - Number of months
 type IntervalYearToMonthRecord record {|
-    int|string year;
-    int|string month;
+    int year;
+    int month;
 |};
 
 
@@ -33,10 +33,10 @@ type IntervalYearToMonthRecord record {|
 # + minute - Number of minutes
 # + second - Number of seconds
 type IntervalDayToSecondRecord record {|
-    int|string day;
-    int|string hour;
-    int|string minute;
-    float|string second;
+    int day;
+    int hour;
+    int minute;
+    float second;
 |};
 
 
@@ -54,7 +54,7 @@ type BfileRecord record {|
 # + attributes - Attributes of the object
 type ObjectTypeRecord record {|
     string typeName;
-    record {} attributes;
+    anydata[] attributes;
 |};
 
 
