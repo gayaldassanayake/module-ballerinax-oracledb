@@ -157,6 +157,7 @@ def needSeparateTest = false
 def needBuildWithTest = false
 def needPublishToCentral = false
 def needPublishToLocalCentral = false
+def skipTests = true
 
 task initializeVariables {
     if (project.hasProperty("groups")) {
@@ -199,6 +200,7 @@ task initializeVariables {
         
         if (graph.hasTask(":${packageName}-ballerina:test")) {
             testParams = "${testCoverageParam}"
+            skipTests = false
         } else {
             testParams = "--skip-tests"
         }
@@ -336,14 +338,19 @@ static def checkExecResult(execResult, failText, standardOutput){
     }
 }
 
-task createTestDockerImage(type: Exec) {
-    if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
-        def standardOutput = new ByteArrayOutputStream()
-        commandLine 'sh', '-c', "docker build -f $project.projectDir/tests/resources/Dockerfile -t ballerina-oracledb" +
-                " -q $project.projectDir/tests/resources/"
-        doLast {
-            checkExecResult(execResult, 'Error', standardOutput)
-            sleep(10 * 1000)
+task createTestDockerImage() {
+    def runTests = false
+    gradle.taskGraph.whenReady { graph ->
+        if (graph.hasTask(":${packageName}-ballerina:test") && !Os.isFamily(Os.FAMILY_WINDOWS)) {
+            def standardOutput = new ByteArrayOutputStream()
+            def execResult = exec {
+                commandLine 'sh', '-c', "docker build -f $project.projectDir/tests/resources/Dockerfile -t ballerina-oracledb" +
+                    " -q $project.projectDir/tests/resources/"
+            }
+            doLast {
+                checkExecResult(execResult, 'Error', standardOutput)
+                sleep(10 * 1000)
+            }
         }
     }
 }
@@ -397,7 +404,7 @@ def initializeDatabase(containerName) {
 }
 
 def startDockerContainer(containerName, port) {
-    if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
+     if (graph.hasTask(":${packageName}-ballerina:test") && !Os.isFamily(Os.FAMILY_WINDOWS)) {
         exec {
             commandLine 'sh', '-c', "docker run --rm -d --name ${containerName} -p ${port}:1521 -t ballerina-oracledb"
         }
@@ -417,14 +424,18 @@ def startDockerContainer(containerName, port) {
 }
 
 task startTestDockerContainers() {
-    doLast {
-        if (poolTests) {
-            GParsPool.withPool { GParsPool.executeAsyncAndWait(
-                    {startDockerContainer("ballerina-oracledb", 1521)},
-                    {startDockerContainer("ballerina-oracledb-pool", 1522)}
-            )}
-        } else {
-            startDockerContainer("ballerina-oracledb", 1521)
+    gradle.taskGraph.whenReady { graph ->
+        if (graph.hasTask(":${packageName}-ballerina:test")) {
+            doLast {
+                if (poolTests) {
+                    GParsPool.withPool { GParsPool.executeAsyncAndWait(
+                            {startDockerContainer("ballerina-oracledb", 1521)},
+                            {startDockerContainer("ballerina-oracledb-pool", 1522)}
+                    )}
+                } else {
+                    startDockerContainer("ballerina-oracledb", 1521)
+                }
+            }
         }
     }
 }
@@ -453,15 +464,18 @@ unpackJballerinaTools.dependsOn copyToLib
 unpackStdLibs.dependsOn unpackJballerinaTools
 copyStdlibs.dependsOn unpackStdLibs
 updateTomlFile.dependsOn copyStdlibs
+
+createTestDockerImage.dependsOn initializeVariables
 startTestDockerContainers.dependsOn createTestDockerImage
+ballerinaBuild.dependsOn startTestDockerContainers
 
 ballerinaBuild.dependsOn updateTomlFile
-ballerinaBuild.dependsOn initializeVariables
 ballerinaBuild.dependsOn ":${packageName}-native:build"
 ballerinaBuild.finalizedBy revertTomlFile
 ballerinaBuild.finalizedBy stopTestDockerContainers
-test.dependsOn startTestDockerContainers
-test.finalizedBy ballerinaBuild
+
+// test.dependsOn startTestDockerContainers
+// test.finalizedBy ballerinaBuild
 build.dependsOn ballerinaBuild
 
 publishToMavenLocal.dependsOn build
