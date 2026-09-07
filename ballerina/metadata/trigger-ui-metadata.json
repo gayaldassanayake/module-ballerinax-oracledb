@@ -299,7 +299,7 @@
                     "typeMembers": [
                       {
                         "type": "DriverSslConfiguration",
-                        "packageInfo": "ballerinax:oracledb:1.17.0",
+                        "packageInfo": "ballerinax:oracledb:1.17.1",
                         "packageName": "oracledb",
                         "kind": "RECORD_TYPE",
                         "selected": true
@@ -339,7 +339,7 @@
                     "typeMembers": [
                       {
                         "type": "OracleOptions",
-                        "packageInfo": "ballerinax:oracledb:1.17.0",
+                        "packageInfo": "ballerinax:oracledb:1.17.1",
                         "packageName": "oracledb",
                         "kind": "RECORD_TYPE",
                         "selected": true

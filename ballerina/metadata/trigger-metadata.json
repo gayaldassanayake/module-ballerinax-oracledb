@@ -38,7 +38,7 @@
               {
                 "id": "$service.onRead.afterEntry",
                 "name": "afterEntry",
-                "doc": "The row as captured. Declare a record type to project its columns, see the rowState data-binding rule.",
+                "doc": "The row as captured. Declare a record type to project its columns.",
                 "type": { "name": "record {}", "builtin": true },
                 "presence": "required",
                 "dataBinding": { "typedescs": [{ "constraint": { "name": "record {}", "builtin": true }, "shapes": [{ "form": "bare" }] }] }
@@ -48,7 +48,7 @@
                 "name": "tableName",
                 "doc": "Name of the table the row came from, useful when one service handles several tables.",
                 "type": { "name": "string", "builtin": true },
-                "presence": "required"
+                "presence": "optional"
               }
             ],
             "returns": { "id": "$service.onRead.returns", "type": [{ "name": "error", "builtin": true }, { "name": "()", "builtin": true }] }
@@ -63,7 +63,7 @@
               {
                 "id": "$service.onCreate.afterEntry",
                 "name": "afterEntry",
-                "doc": "The row's state after the insert. Declare a record type to project its columns, see the rowState data-binding rule.",
+                "doc": "The row's state after the insert. Declare a record type to project its columns.",
                 "type": { "name": "record {}", "builtin": true },
                 "presence": "required",
                 "dataBinding": { "typedescs": [{ "constraint": { "name": "record {}", "builtin": true }, "shapes": [{ "form": "bare" }] }] }
@@ -73,7 +73,7 @@
                 "name": "tableName",
                 "doc": "Name of the table the change occurred in.",
                 "type": { "name": "string", "builtin": true },
-                "presence": "required"
+                "presence": "optional"
               }
             ],
             "returns": { "id": "$service.onCreate.returns", "type": [{ "name": "error", "builtin": true }, { "name": "()", "builtin": true }] }
@@ -106,7 +106,7 @@
                 "name": "tableName",
                 "doc": "Name of the table the change occurred in.",
                 "type": { "name": "string", "builtin": true },
-                "presence": "required"
+                "presence": "optional"
               }
             ],
             "returns": { "id": "$service.onUpdate.returns", "type": [{ "name": "error", "builtin": true }, { "name": "()", "builtin": true }] }
@@ -131,7 +131,7 @@
                 "name": "tableName",
                 "doc": "Name of the table the change occurred in.",
                 "type": { "name": "string", "builtin": true },
-                "presence": "required"
+                "presence": "optional"
               }
             ],
             "returns": { "id": "$service.onDelete.returns", "type": [{ "name": "error", "builtin": true }, { "name": "()", "builtin": true }] }
